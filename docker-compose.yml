@@ -1,0 +1,62 @@
+services:
+  web:
+    build: .
+    command: gunicorn --bind 0.0.0.0:5000 run:app
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/dbname
+      - REDIS_URL=redis://redis:6379/0
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=dbname
+    ports:
+      - "5432:5432"  # Expose PostgreSQL on the host machine's port 5432
+    networks:
+      - default
+    # Allow all connections (use only in development)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  redis:
+    image: redis:6
+    
+  celery_worker:
+    build: .
+    command: celery -A app.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - db
+      - redis
+
+  celery_beat:
+    build: .
+    command: celery -A app.celery beat --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - db
+      - redis
+
+volumes:
+  postgres_data:
