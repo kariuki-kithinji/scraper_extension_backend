@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from app.scrape import Scraper
 from app.classifier import WebsiteClassifier
 from app.domain import get_all_domain_info
+from celery.signals import task_success
 
 celery = Celery()
 
@@ -31,7 +32,7 @@ def classifier_queue_manager(self, html):
         soup = BeautifulSoup(html, 'lxml')
         predicted_category = classifier.classify_website(soup.get_text())
         print(f"Classification result: {predicted_category}")
-        return predicted_category
+        return {"predicted":predicted_category}
     except Exception as e:
         print(f"Error in classifier_queue_manager: {str(e)}")
         return None
@@ -46,5 +47,4 @@ def location_queue_manager(self, url):
     except Exception as e:
         print(f"Error in location_queue_manager: {str(e)}")
         return None
-
 

@@ -121,8 +121,8 @@ class DomainInfo:
             self._whois_info = {
                 'Domain Name': domain_info.domain_name,
                 'Registrar': domain_info.registrar,
-                'Creation Date': domain_info.creation_date,
-                'Expiration Date': domain_info.expiration_date,
+                #'Creation Date': str(domain_info.creation_date),
+                #'Expiration Date': str(domain_info.expiration_date),
                 'Registrant Name': domain_info.registrant_name,
                 'Registrant Organization': domain_info.registrant_organization,
                 'Registrant Country': domain_info.registrant_country
@@ -141,7 +141,7 @@ def get_all_domain_info(url):
         'WHOIS Info': domain_info.get_whois_info(),
         'IP Address': domain_info.get_ip_address(),
         'Server Location': domain_info.get_server_location(),
-        'Extracted Locations': domain_info.get_location_data(),
+        #'Extracted Locations': domain_info.get_location_data(),
         'Country Code': domain_info.get_country_code()
     }
 

@@ -11,6 +11,8 @@ from logging.handlers import RotatingFileHandler
 from app.models import db
 from app.tasks import celery
 from app.utils import cache , limiter
+from app.api.v1 import bp as api_v1_bp
+
 # Load environment variables
 load_dotenv()
 
@@ -33,7 +35,7 @@ def create_app():
     CORS(app)
     limiter.init_app(app)
     celery.conf.update(app.config)
-    celery.autodiscover_tasks(['app','app.tasks'],force=True)
+    celery.autodiscover_tasks(['app','app.tasks','app.api.v1.routes'],force=True)
     
     # Create the database tables if not exists
     with app.app_context():
@@ -54,8 +56,6 @@ def create_app():
     app.redis = Redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379/3'))
     app.task_queue = Queue(connection=app.redis)
 
-    # Register blueprints
-    from app.api.v1 import bp as api_v1_bp
     app.register_blueprint(api_v1_bp, url_prefix='/api/v1')
 
     return app

@@ -20,15 +20,10 @@ class SiteRecord(db.Model, TimestampMixin):
     saved = db.Column(db.Boolean, default=False, index=True)
     html_hash = db.Column(db.String(32), nullable=True)
 
-    # Foreign keys to task records
-    social_task_id = db.Column(db.Integer, db.ForeignKey('task_records.id'), nullable=True)
-    classifier_task_id = db.Column(db.Integer, db.ForeignKey('task_records.id'), nullable=True)
-    location_task_id = db.Column(db.Integer, db.ForeignKey('task_records.id'), nullable=True)
-
-    # Relationships to TaskRecord
-    social_task = db.relationship('TaskRecord', foreign_keys=[social_task_id])
-    classifier_task = db.relationship('TaskRecord', foreign_keys=[classifier_task_id])
-    location_task = db.relationship('TaskRecord', foreign_keys=[location_task_id])
+    # Task IDs as simple strings (no foreign keys)
+    social_task_id = db.Column(db.String(255), nullable=True)
+    classifier_task_id = db.Column(db.String(255), nullable=True)
+    location_task_id = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return f'<SiteRecord {self.url}>'
@@ -41,9 +36,9 @@ class SiteRecord(db.Model, TimestampMixin):
             'flagged': self.flagged,
             'saved': self.saved,
             'html_hash': self.html_hash,
-            'social_task': self.social_task.to_dict() if self.social_task else None,
-            'classifier_task': self.classifier_task.to_dict() if self.classifier_task else None,
-            'location_task': self.location_task.to_dict() if self.location_task else None,
+            'social_task_id': self.social_task_id,
+            'classifier_task_id': self.classifier_task_id,
+            'location_task_id': self.location_task_id,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
